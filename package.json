@@ -1,0 +1,46 @@
+{
+    "name": "blog-api",
+    "version": "1.0.0",
+    "description": "Blogs! A simple backend for eventual frontends for running a simple blog page! Project made for the Odin Project!",
+    "main": "app.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "dev": "nodemon ./src/app.js",
+        "start": "node ./src/app.js",
+        "prestart": "prisma generate",
+        "check": "prettier . --check",
+        "write": "prettier . --write"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/SapphicBear/Blog-API.git"
+    },
+    "keywords": [
+        "Blog API",
+        "RESTful API",
+        "REST API"
+    ],
+    "author": "",
+    "license": "ISC",
+    "type": "module",
+    "bugs": {
+        "url": "https://github.com/SapphicBear/Blog-API/issues"
+    },
+    "homepage": "https://github.com/SapphicBear/Blog-API#readme",
+    "dependencies": {
+        "@prisma/adapter-pg": "^7.8.0",
+        "@prisma/client": "^7.8.0",
+        "bcryptjs": "^3.0.3",
+        "cors": "^2.8.6",
+        "dotenv": "^17.4.2",
+        "express": "^5.2.1",
+        "jsonwebtoken": "^9.0.3",
+        "passport": "^0.7.0",
+        "passport-jwt": "^4.0.1",
+        "pg": "^8.21.0"
+    },
+    "devDependencies": {
+        "prettier": "3.8.4",
+        "prisma": "^6.19.3"
+    }
+}
