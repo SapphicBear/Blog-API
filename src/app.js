@@ -1,16 +1,14 @@
 import express from "express";
 import "dotenv/config";
 import routes from "./routes/index.js";
-
+import models from "./models/index.js";
 const app = express();
 const PORT = process.env.PORT | 3000;
-const DEFAULT_URI = "/api/v1";
-const URI_ENUM = ["/users", "/posts", "/login"];
 
 app.use(express.urlencoded({ extended: true }));
 
-app.use(`${DEFAULT_URI}${URI_ENUM[0]}`, routes.users);
-app.use(`${DEFAULT_URI}${URI_ENUM[1]}`, routes.posts);
+app.use(`${models.uri.DEFAULT_URI}${models.uri.URI_ENUM[0]}`, routes.users);
+app.use(`${models.uri.DEFAULT_URI}${models.uri.URI_ENUM[1]}`, routes.posts);
 app.use((err, req, res, next) => {
     console.error(err);
     res.sendStatus(err.statusCode || 500);
