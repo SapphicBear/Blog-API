@@ -10,7 +10,7 @@ const URI_ENUM = ["/users", "/posts", "/login"];
 app.use(express.urlencoded({ extended: true }));
 
 app.use(`${DEFAULT_URI}${URI_ENUM[0]}`, routes.users);
-
+app.use(`${DEFAULT_URI}${URI_ENUM[1]}`, routes.posts);
 app.use((err, req, res, next) => {
     console.error(err);
     res.sendStatus(err.statusCode || 500);

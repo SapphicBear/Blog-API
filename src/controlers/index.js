@@ -1,4 +1,4 @@
 // Combine file for controllers
 import users from "./users.js";
-
-export default { users };
+import posts from "./posts.js";
+export default { users, posts };
