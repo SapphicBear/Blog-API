@@ -7,8 +7,8 @@ const PORT = process.env.PORT | 3000;
 
 app.use(express.urlencoded({ extended: true }));
 
-app.use(`${models.uri.DEFAULT_URI}${models.uri.URI_ENUM[0]}`, routes.users);
-app.use(`${models.uri.DEFAULT_URI}${models.uri.URI_ENUM[1]}`, routes.posts);
+app.use(models.uri.USERS_URI, routes.users);
+app.use(models.uri.POSTS_URI, routes.posts);
 
 app.use((err, req, res, next) => {
     console.error(err);

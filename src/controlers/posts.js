@@ -1,5 +1,3 @@
-import prisma from "./../../lib/prisma.js";
-
 const controller = {
     async get(req, res) {
         console.log(req);
