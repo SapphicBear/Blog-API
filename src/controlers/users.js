@@ -2,13 +2,28 @@ import { prisma } from "./../../lib/prisma.js";
 
 const controller = {
     async get(req, res) {
-        console.log(req);
-        req.users = [{ userId: 1, name: "Taylor", age: 29 }];
+        req.users = await prisma.user.findMany();
+
         res.json({ users: req.users });
     },
     async post(req, res) {
-        console.log("From controllers/users, POST request");
-        res.json({ msg: "POST Request on /users" });
+        // A user has a username, email, posts and comments
+        req.users = {
+            name: req.query.name,
+            email: req.query.email,
+            role: req.query.role,
+        };
+        // await prisma.user.create({
+        //     include: {
+        //         posts: [],
+        //         comments: [],
+        //     },
+        //     data: {
+        //         email: req.query.email,
+        //         name: req.query.name,
+        //     },
+        // });
+        res.json({ msg: "User added to database" });
     },
 };
 

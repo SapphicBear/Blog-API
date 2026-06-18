@@ -11,8 +11,14 @@ const controller = {
         res.json({ posts: req.posts });
     },
     async post(req, res) {
-        console.log("From controllers/posts, POST request");
-        res.json({ msg: "POST Request on /posts" });
+        const post = {
+            title: req.query.title,
+            content: req.query.content,
+            author: req.query.author,
+            authorId: req.query.authorId,
+        };
+        req.posts = [post];
+        res.json({ posts: req.posts });
     },
 };
 
