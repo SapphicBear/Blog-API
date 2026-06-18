@@ -5,6 +5,10 @@ const controller = {
         console.log(req);
         res.json({ msg: "Controller/users" });
     },
+    async post(req, res) {
+        console.log("From controllers/users, POST request");
+        res.json({ msg: "POST Request on /users" });
+    },
 };
 
 export default controller;
