@@ -3,6 +3,7 @@ import controllers from "./../controlers/index.js";
 const router = Router();
 
 router.get("/", controllers.users.get);
+router.get("/:userId", controllers.users.get);
 router.post("/", controllers.users.post);
 // router.put();
 // router.delete();

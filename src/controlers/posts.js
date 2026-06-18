@@ -2,12 +2,23 @@ import { prisma } from "./../../lib/prisma.js";
 
 const controller = {
     async get(req, res) {
-        console.log(req);
-        req.posts = {
-            title: "Hello!",
-            authorId: 1,
-            content: "Hello everyone!",
-        };
+        // If param/query wants all, send all, otherwise, return only post specified by id
+        // if (!req.params) {
+        //     req.posts = await prisma.post.findMany();
+        // } else {
+        //     req.posts = await prisma.post.findUnique({
+        //         where: {
+        //             id: req.params.postId,
+        //         },
+        //     });
+        // }
+        if (!req.params.postId) {
+            req.posts = { msg: "No param was specified, returning all" };
+        } else {
+            req.posts = {
+                msg: `Param specified: postId: ${req.params.postId}`,
+            };
+        }
         res.json({ posts: req.posts });
     },
     async post(req, res) {

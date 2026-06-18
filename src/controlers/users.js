@@ -2,8 +2,14 @@ import { prisma } from "./../../lib/prisma.js";
 
 const controller = {
     async get(req, res) {
-        req.users = await prisma.user.findMany();
-
+        // req.users = await prisma.user.findMany();
+        if (!req.params.userId) {
+            req.users = { msg: "No param was specified, returning all" };
+        } else {
+            req.users = {
+                msg: `Param specified: userId: ${req.params.userId}`,
+            };
+        }
         res.json({ users: req.users });
     },
     async post(req, res) {

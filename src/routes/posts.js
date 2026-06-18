@@ -3,6 +3,7 @@ import controllers from "./../controlers/index.js";
 const router = Router();
 
 router.get("/", controllers.posts.get);
+router.get("/:postId", controllers.posts.get);
 router.post("/", controllers.posts.post);
 // router.put()
 // router.delete()
