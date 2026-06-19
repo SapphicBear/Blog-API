@@ -48,6 +48,10 @@ const controller = {
             res.json({ error: err });
         }
     },
+    async put(req, res) {
+        console.log("PUT");
+    },
+    async delete(req, res) {},
 };
 
 export default controller;

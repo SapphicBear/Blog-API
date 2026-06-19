@@ -6,5 +6,6 @@ router.get("/", controllers.users.get);
 router.get("/:userId", controllers.users.get);
 router.post("/", controllers.users.post);
 router.put("/:userId", controllers.users.put);
-// router.delete();
+router.delete("/:userId", controllers.users.delete);
+
 export default router;

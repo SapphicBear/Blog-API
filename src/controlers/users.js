@@ -107,6 +107,12 @@ const controller = {
             });
         }
     },
+    async delete(req, res) {
+        // Authentication, TODO
+        // if (req.user.role !== "ADMIN") {
+        //     return;
+        // }
+    },
 };
 
 export default controller;
