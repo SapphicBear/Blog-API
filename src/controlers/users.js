@@ -10,6 +10,7 @@ const controller = {
                         comments: true,
                     },
                 });
+                res.json(req.users);
             } catch (err) {
                 console.error(err);
                 res.json(err);
