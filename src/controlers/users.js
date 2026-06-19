@@ -2,13 +2,23 @@ import { prisma } from "./../../lib/prisma.js";
 
 const controller = {
     async get(req, res) {
-        // req.users = await prisma.user.findMany();
         if (!req.params.userId) {
-            req.users = { msg: "No param was specified, returning all" };
+            req.users = await prisma.user.findMany({
+                include: {
+                    posts: true,
+                    comments: true,
+                },
+            });
         } else {
-            req.users = {
-                msg: `Param specified: userId: ${req.params.userId}`,
-            };
+            req.users = await prisma.user.findUnique({
+                where: {
+                    id: parseInt(req.params.userId),
+                },
+                include: {
+                    posts: true,
+                    comments: true,
+                },
+            });
         }
         res.json({ users: req.users });
     },
@@ -19,16 +29,16 @@ const controller = {
             email: req.query.email,
             role: req.query.role,
         };
-        // await prisma.user.create({
-        //     include: {
-        //         posts: [],
-        //         comments: [],
-        //     },
-        //     data: {
-        //         email: req.query.email,
-        //         name: req.query.name,
-        //     },
-        // });
+        await prisma.user.create({
+            include: {
+                posts: [],
+                comments: [],
+            },
+            data: {
+                email: req.query.email,
+                name: req.query.name,
+            },
+        });
         res.json({ msg: "User added to database" });
     },
 };
