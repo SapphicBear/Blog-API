@@ -53,6 +53,60 @@ const controller = {
             res.sendStatus(400).json({ error: err });
         }
     },
+    async put(req, res) {
+        try {
+            switch (req.query.type) {
+                case "name":
+                    await prisma.user.update({
+                        where: {
+                            id: parseInt(req.params.userId),
+                        },
+                        data: {
+                            name: req.query.data,
+                        },
+                    });
+                    break;
+                case "email":
+                    await prisma.user.update({
+                        where: {
+                            id: parseInt(req.params.userId),
+                        },
+                        data: {
+                            email: req.query.data,
+                        },
+                    });
+                    break;
+                case "password":
+                    await prisma.user.update({
+                        where: {
+                            id: parseInt(req.params.userId),
+                        },
+                        data: {
+                            password: req.query.data,
+                        },
+                    });
+                    break;
+                case "role":
+                    await prisma.user.update({
+                        where: {
+                            id: parseInt(req.params.userId),
+                        },
+                        data: {
+                            role: req.query.data,
+                        },
+                    });
+                default:
+                    throw new Error("No type given for update!");
+            }
+        } catch (err) {
+            console.error(err);
+            res.json(err);
+        } finally {
+            res.json({
+                msg: `User info updated for userId: ${req.params.userId}`,
+            });
+        }
+    },
 };
 
 export default controller;

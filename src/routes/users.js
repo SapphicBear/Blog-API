@@ -5,6 +5,6 @@ const router = Router();
 router.get("/", controllers.users.get);
 router.get("/:userId", controllers.users.get);
 router.post("/", controllers.users.post);
-// router.put();
+router.put("/update/:userId", controllers.users.put);
 // router.delete();
 export default router;
