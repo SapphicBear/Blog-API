@@ -112,6 +112,17 @@ const controller = {
         // if (req.user.role !== "ADMIN") {
         //     return;
         // }
+        try {
+            const user = await prisma.user.delete({
+                where: {
+                    id: req.params.userId,
+                },
+            });
+            res.json({ user: user, msg: "User sucessfully deleted" });
+        } catch (err) {
+            console.error(err);
+            res.sendStatus(400).json(err);
+        }
     },
 };
 
