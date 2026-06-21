@@ -45,7 +45,7 @@ const controller = {
             res.json({ msg: "Post added to the database" });
         } catch (err) {
             console.error(err);
-            res.json({ error: err });
+            res.json(err);
         }
     },
     async put(req, res) {
