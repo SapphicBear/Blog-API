@@ -11,13 +11,22 @@ const controller = {
                         author: true,
                     },
                 });
-                res.json(req.posts);
+                if (!req.posts) {
+                    throw new Error("No posts found in database.");
+                } else {
+                    res.json(req.posts);
+                }
             } catch (err) {
                 console.error(err);
-                res.sendStatus(400).json(err);
+                res.sendStatus(400).json({ msg: `${err}` });
             }
         } else {
             try {
+                if (isNaN(req.params.postId)) {
+                    throw new Error(
+                        "Wrong type of postId given. Please provide a number!"
+                    );
+                }
                 req.posts = await prisma.post.findUnique({
                     include: {
                         comments: true,
@@ -26,10 +35,16 @@ const controller = {
                         id: parseInt(req.params.postId),
                     },
                 });
-                res.json({ posts: req.posts });
+                if (!req.posts) {
+                    throw new Error(
+                        "No post with that postId found in Database"
+                    );
+                } else {
+                    res.json({ posts: req.posts });
+                }
             } catch (err) {
                 console.error(err);
-                res.json(err);
+                res.json({ msg: `${err}` });
             }
         }
     },
@@ -45,7 +60,7 @@ const controller = {
             res.json({ msg: "Post added to the database" });
         } catch (err) {
             console.error(err);
-            res.json(err);
+            res.json({ msg: `${err}` });
         }
     },
     async put(req, res) {
@@ -89,7 +104,7 @@ const controller = {
             });
         } catch (err) {
             console.error(err);
-            res.json(err);
+            res.json({ msg: `${err}` });
         }
     },
     async delete(req, res) {
@@ -106,7 +121,7 @@ const controller = {
             res.json({ post: post, msg: "Post sucessfully deleted" });
         } catch (err) {
             console.error(err);
-            res.sendStatus(400).json(err);
+            res.sendStatus(400).json({ msg: `${err}` });
         }
     },
 };

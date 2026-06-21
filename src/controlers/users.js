@@ -10,13 +10,21 @@ const controller = {
                         comments: true,
                     },
                 });
+                if (!req.users) {
+                    throw new Error("No users found in database.");
+                }
                 res.json(req.users);
             } catch (err) {
                 console.error(err);
-                res.json(err);
+                res.json({ msg: `${err}` });
             }
         } else {
             try {
+                if (isNaN(req.params.userId)) {
+                    throw new Error(
+                        "userId Must be a number. Please provide a number parameter"
+                    );
+                }
                 req.users = await prisma.user.findUnique({
                     where: {
                         id: parseInt(req.params.userId),
@@ -26,10 +34,13 @@ const controller = {
                         comments: true,
                     },
                 });
+                if (!req.users) {
+                    throw new Error("No user was found with this userId");
+                }
                 res.json({ users: req.users });
             } catch (err) {
                 console.error(err);
-                res.json(err);
+                res.json({ msg: `${err}` });
             }
         }
     },
@@ -50,11 +61,16 @@ const controller = {
             res.json({ msg: "User added to database" });
         } catch (err) {
             console.error(err);
-            res.sendStatus(400).json({ error: err });
+            res.sendStatus(400).json({ msg: `${err}` });
         }
     },
     async put(req, res) {
         try {
+            if (!req.params.userId) {
+                throw new Error(
+                    "No userId provided. Please provide a userId number."
+                );
+            }
             switch (req.body.type) {
                 case "name":
                     await prisma.user.update({
@@ -98,13 +114,12 @@ const controller = {
                 default:
                     throw new Error("No type given for update!");
             }
-        } catch (err) {
-            console.error(err);
-            res.json(err);
-        } finally {
             res.json({
                 msg: `User info updated for userId: ${req.params.userId}`,
             });
+        } catch (err) {
+            console.error(err);
+            res.json({ msg: `${err}` });
         }
     },
     async delete(req, res) {
@@ -113,6 +128,11 @@ const controller = {
         //     return;
         // }
         try {
+            if (!req.params.userId) {
+                throw new Error("Please provide a userId.");
+            } else if (isNaN(req.params.userId)) {
+                throw new Error("UserId must be a number.");
+            }
             const user = await prisma.user.delete({
                 where: {
                     id: req.params.userId,
@@ -121,7 +141,7 @@ const controller = {
             res.json({ user: user, msg: "User sucessfully deleted" });
         } catch (err) {
             console.error(err);
-            res.sendStatus(400).json(err);
+            res.sendStatus(400).json({ msg: `${err}` });
         }
     },
 };
