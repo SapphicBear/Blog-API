@@ -42,9 +42,9 @@ const controller = {
                     comments: [],
                 },
                 data: {
-                    email: req.query.email,
-                    name: req.query.name,
-                    password: req.query.password,
+                    email: req.body.email,
+                    name: req.body.name,
+                    password: req.body.password,
                 },
             });
             res.json({ msg: "User added to database" });
@@ -55,14 +55,14 @@ const controller = {
     },
     async put(req, res) {
         try {
-            switch (req.query.type) {
+            switch (req.body.type) {
                 case "name":
                     await prisma.user.update({
                         where: {
                             id: parseInt(req.params.userId),
                         },
                         data: {
-                            name: req.query.data,
+                            name: req.body.data,
                         },
                     });
                     break;
@@ -72,7 +72,7 @@ const controller = {
                             id: parseInt(req.params.userId),
                         },
                         data: {
-                            email: req.query.data,
+                            email: req.body.data,
                         },
                     });
                     break;
@@ -82,7 +82,7 @@ const controller = {
                             id: parseInt(req.params.userId),
                         },
                         data: {
-                            password: req.query.data,
+                            password: req.body.data,
                         },
                     });
                     break;
@@ -92,7 +92,7 @@ const controller = {
                             id: parseInt(req.params.userId),
                         },
                         data: {
-                            role: req.query.data,
+                            role: req.body.data,
                         },
                     });
                 default:

@@ -37,9 +37,9 @@ const controller = {
         try {
             await prisma.post.create({
                 data: {
-                    title: req.query.title,
-                    content: req.query.content,
-                    authorId: parseInt(req.query.authorId),
+                    title: req.body.title,
+                    content: req.body.content,
+                    authorId: parseInt(req.body.authorId),
                 },
             });
             res.json({ msg: "Post added to the database" });
