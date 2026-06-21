@@ -92,7 +92,23 @@ const controller = {
             res.json(err);
         }
     },
-    async delete(req, res) {},
+    async delete(req, res) {
+        // Authentication, TODO
+        // if (req.user.role !== "ADMIN") {
+        //     return;
+        // }
+        try {
+            const post = await prisma.post.delete({
+                where: {
+                    id: req.params.postId,
+                },
+            });
+            res.json({ post: post, msg: "Post sucessfully deleted" });
+        } catch (err) {
+            console.error(err);
+            res.sendStatus(400).json(err);
+        }
+    },
 };
 
 export default controller;
