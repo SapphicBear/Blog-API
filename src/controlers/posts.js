@@ -49,7 +49,48 @@ const controller = {
         }
     },
     async put(req, res) {
-        console.log("PUT");
+        try {
+            switch (req.body.type) {
+                case "title":
+                    await prisma.post.update({
+                        where: {
+                            id: parseInt(req.params.postId),
+                        },
+                        data: {
+                            title: req.body.data,
+                        },
+                    });
+                    break;
+                case "content":
+                    await prisma.post.update({
+                        where: {
+                            id: parseInt(req.params.postId),
+                        },
+                        data: {
+                            content: req.body.data,
+                        },
+                    });
+                    break;
+                case "published":
+                    await prisma.post.update({
+                        where: {
+                            id: parseInt(req.params.postId),
+                        },
+                        data: {
+                            published: req.body.data,
+                        },
+                    });
+                    break;
+                default:
+                    throw new Error("Type not specified correctly.");
+            }
+            res.json({
+                msg: `${req.body.type} edited on post ${req.params.postId}`,
+            });
+        } catch (err) {
+            console.error(err);
+            res.json(err);
+        }
     },
     async delete(req, res) {},
 };
