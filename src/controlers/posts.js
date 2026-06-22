@@ -5,12 +5,20 @@ const controller = {
         // If param/query wants all, send all, otherwise, return only post specified by id
         if (!req.params.postId) {
             try {
-                req.posts = await prisma.post.findMany({
-                    include: {
-                        comments: true,
-                        author: true,
-                    },
-                });
+                if (!req.query.comments) {
+                    req.posts = await prisma.post.findMany({
+                        include: {
+                            author: true,
+                        },
+                    });
+                } else {
+                    req.posts = await prisma.post.findMany({
+                        include: {
+                            comments: true,
+                            author: true,
+                        },
+                    });
+                }
                 if (!req.posts) {
                     throw new Error("No posts found in database.");
                 } else {
@@ -27,14 +35,26 @@ const controller = {
                         "Wrong type of postId given. Please provide a number!"
                     );
                 }
-                req.posts = await prisma.post.findUnique({
-                    include: {
-                        comments: true,
-                    },
-                    where: {
-                        id: parseInt(req.params.postId),
-                    },
-                });
+                if (!req.query.comments) {
+                    req.posts = await prisma.post.findUnique({
+                        include: {
+                            author: true,
+                        },
+                        where: {
+                            id: parseInt(req.params.postId),
+                        },
+                    });
+                } else {
+                    req.posts = await prisma.post.findUnique({
+                        include: {
+                            comments: true,
+                            author: true,
+                        },
+                        where: {
+                            id: parseInt(req.params.postId),
+                        },
+                    });
+                }
                 if (!req.posts) {
                     throw new Error(
                         "No post with that postId found in Database"

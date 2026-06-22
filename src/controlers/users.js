@@ -3,37 +3,34 @@ import { prisma } from "./../../lib/prisma.js";
 const controller = {
     async get(req, res) {
         if (!req.params.userId) {
-            if (!req.query.posts) {
-                try {
+            try {
+                if (!req.query.posts) {
                     req.users = await prisma.user.findMany();
-                    if (!req.users) {
-                        throw new Error("No users found in database.");
-                    }
-                    res.json(req.users);
-                } catch (err) {
-                    console.error(err);
-                    res.json({ msg: `${err}` });
-                }
-            } else {
-                try {
+                } else if (req.query.posts && !req.query.comments) {
+                    req.users = await prisma.user.findMany({
+                        include: {
+                            posts: true,
+                        },
+                    });
+                } else {
                     req.users = await prisma.user.findMany({
                         include: {
                             posts: true,
                             comments: true,
                         },
                     });
-                    if (!req.users) {
-                        throw new Error("No users found in database.");
-                    }
-                    res.json(req.users);
-                } catch (err) {
-                    console.error(err);
-                    res.json({ msg: `${err}` });
                 }
+                if (!req.users) {
+                    throw new Error("No users found in database.");
+                }
+                res.json(req.users);
+            } catch (err) {
+                console.error(err);
+                res.json({ msg: `${err}` });
             }
         } else {
-            if (!req.query.posts) {
-                try {
+            try {
+                if (!req.query.posts) {
                     if (isNaN(req.params.userId)) {
                         throw new Error(
                             "userId Must be a number. Please provide a number parameter"
@@ -44,21 +41,16 @@ const controller = {
                             id: parseInt(req.params.userId),
                         },
                     });
-                    if (!req.users) {
-                        throw new Error("No user was found with this userId");
-                    }
-                    res.json({ users: req.users });
-                } catch (err) {
-                    console.error(err);
-                    res.json({ msg: `${err}` });
-                }
-            } else {
-                try {
-                    if (isNaN(req.params.userId)) {
-                        throw new Error(
-                            "userId Must be a number. Please provide a number parameter"
-                        );
-                    }
+                } else if (req.query.posts && !req.query.comments) {
+                    req.users = await prisma.user.findUnique({
+                        where: {
+                            id: parseInt(req.params.userId),
+                        },
+                        include: {
+                            posts: true,
+                        },
+                    });
+                } else {
                     req.users = await prisma.user.findUnique({
                         where: {
                             id: parseInt(req.params.userId),
@@ -68,14 +60,14 @@ const controller = {
                             comments: true,
                         },
                     });
-                    if (!req.users) {
-                        throw new Error("No user was found with this userId");
-                    }
-                    res.json({ users: req.users });
-                } catch (err) {
-                    console.error(err);
-                    res.json({ msg: `${err}` });
                 }
+                if (!req.users) {
+                    throw new Error("No user was found with this userId");
+                }
+                res.json({ users: req.users });
+            } catch (err) {
+                console.error(err);
+                res.json({ msg: `${err}` });
             }
         }
     },
