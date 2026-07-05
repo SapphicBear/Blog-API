@@ -3,15 +3,23 @@ import "dotenv/config";
 import routes from "./routes/index.js";
 import models from "./models/index.js";
 import { cors, corsOptions } from "./cors.js";
-
+import passport from "./passport.js";
 const app = express();
 const PORT = process.env.PORT | 3000;
 
 app.use(express.urlencoded({ extended: true }));
 app.use(cors(corsOptions));
 
-app.use(models.uri.USERS_URI, routes.users);
-app.use(models.uri.POSTS_URI, routes.posts);
+app.use(
+    models.uri.USERS_URI,
+    passport.authenticate("jwt", { session: false }),
+    routes.users
+);
+app.use(
+    models.uri.POSTS_URI,
+    passport.authenticate("jwt", { session: false }),
+    routes.posts
+);
 
 app.use((err, req, res, next) => {
     console.error(err);
