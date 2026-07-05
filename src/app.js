@@ -2,10 +2,13 @@ import express from "express";
 import "dotenv/config";
 import routes from "./routes/index.js";
 import models from "./models/index.js";
+import { cors, corsOptions } from "./cors.js";
+
 const app = express();
 const PORT = process.env.PORT | 3000;
 
 app.use(express.urlencoded({ extended: true }));
+app.use(cors(corsOptions));
 
 app.use(models.uri.USERS_URI, routes.users);
 app.use(models.uri.POSTS_URI, routes.posts);
