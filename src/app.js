@@ -20,6 +20,7 @@ app.use(
     /* passport.authenticate("jwt", { session: false }), */
     routes.posts
 );
+app.use(models.uri.LOGIN_URI, routes.auth);
 
 app.use((err, req, res, next) => {
     console.error(err);

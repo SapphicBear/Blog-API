@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 import passport from "passport";
 
 const router = Router();
-router.post("/login", function (req, res, next) {
+router.post("/", function (req, res, next) {
     passport.authenticate("local", { session: false }, (err, user, info) => {
         if (err || !user) {
             return res.status(400).json({
@@ -21,3 +21,4 @@ router.post("/login", function (req, res, next) {
         });
     })(req, res);
 });
+export default router;
