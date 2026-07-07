@@ -2,93 +2,79 @@ import { prisma } from "./../../lib/prisma.js";
 
 const controller = {
     async get(req, res) {
-        if (req.user.role !== "ADMIN") {
-            if (req.user.id == req.params.userId || !req.params.userId) {
-                try {
+        try {
+            if (req.user.role !== "ADMIN") {
+                // User can only find themselves, no other user information can be shown
+                if (
+                    !req.params.userId ||
+                    req.user.id === parseInt(req.params.userId)
+                ) {
                     req.users = await prisma.user.findMany({
                         where: { id: req.user.id },
                     });
-                    if (!req.users) {
-                        throw new Error("No users found");
-                    }
                     res.json(req.users);
-                } catch (err) {
-                    console.error(err);
-                    res.json({ msg: `${err}` });
+                } else {
+                    res.sendStatus(401);
                 }
             } else {
-                res.status(401).json({
-                    msg: "Unauthorized: You are not admin",
-                });
-            }
-        }
-        if (!req.params.userId) {
-            try {
-                if (!req.query.posts) {
-                    req.users = await prisma.user.findMany();
+                if (!req.params.userId) {
+                    req.users = await prisma.user.findMany(); // Find all users for ADMIN users
                 } else if (req.query.posts && !req.query.comments) {
                     req.users = await prisma.user.findMany({
                         include: {
                             posts: true,
                         },
                     });
-                } else {
+                } else if (req.query.posts && req.query.comments) {
                     req.users = await prisma.user.findMany({
                         include: {
                             posts: true,
                             comments: true,
                         },
                     });
-                }
-                if (!req.users) {
-                    throw new Error("No users found in database.");
-                }
-                res.json(req.users);
-            } catch (err) {
-                console.error(err);
-                res.json({ msg: `${err}` });
-            }
-        } else {
-            try {
-                if (!req.query.posts) {
+                } else {
                     if (isNaN(req.params.userId)) {
                         throw new Error(
                             "userId Must be a number. Please provide a number parameter"
                         );
+                    } else {
+                        let userId = parseInt(req.params.userId);
+
+                        if (!req.query.posts) {
+                            req.users = await prisma.user.findUnique({
+                                where: {
+                                    id: userId,
+                                },
+                            });
+                        } else if (req.query.posts && !req.query.comments) {
+                            req.users = await prisma.user.findUnique({
+                                where: {
+                                    id: userId,
+                                },
+                                include: {
+                                    posts: true,
+                                },
+                            });
+                        } else if (req.query.posts && req.query.comments) {
+                            req.users = await prisma.user.findUnique({
+                                where: {
+                                    id: userId,
+                                },
+                                include: {
+                                    posts: true,
+                                    comments: true,
+                                },
+                            });
+                        }
                     }
-                    req.users = await prisma.user.findUnique({
-                        where: {
-                            id: parseInt(req.params.userId),
-                        },
-                    });
-                } else if (req.query.posts && !req.query.comments) {
-                    req.users = await prisma.user.findUnique({
-                        where: {
-                            id: parseInt(req.params.userId),
-                        },
-                        include: {
-                            posts: true,
-                        },
-                    });
-                } else {
-                    req.users = await prisma.user.findUnique({
-                        where: {
-                            id: parseInt(req.params.userId),
-                        },
-                        include: {
-                            posts: true,
-                            comments: true,
-                        },
-                    });
                 }
-                if (!req.users) {
-                    throw new Error("No user was found with this userId");
-                }
-                res.json({ users: req.users });
-            } catch (err) {
-                console.error(err);
-                res.json({ msg: `${err}` });
             }
+            if (!req.users) {
+                throw new Error("No users found in database");
+            }
+        } catch (err) {
+            console.error(err);
+            res.json({ msg: `${err}` });
         }
     },
     async post(req, res) {
