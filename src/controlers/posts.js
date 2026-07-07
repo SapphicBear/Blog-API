@@ -70,6 +70,9 @@ const controller = {
         }
     },
     async post(req, res) {
+        if (!req.user) {
+            res.sendStatus(401);
+        }
         try {
             await prisma.post.create({
                 data: {
@@ -85,40 +88,83 @@ const controller = {
         }
     },
     async put(req, res) {
+        if (!req.user) {
+            res.sendStatus(401);
+        }
         try {
-            switch (req.body.type) {
-                case "title":
-                    await prisma.post.update({
-                        where: {
-                            id: parseInt(req.params.postId),
-                        },
-                        data: {
-                            title: req.body.data,
-                        },
-                    });
-                    break;
-                case "content":
-                    await prisma.post.update({
-                        where: {
-                            id: parseInt(req.params.postId),
-                        },
-                        data: {
-                            content: req.body.data,
-                        },
-                    });
-                    break;
-                case "published":
-                    await prisma.post.update({
-                        where: {
-                            id: parseInt(req.params.postId),
-                        },
-                        data: {
-                            published: req.body.data,
-                        },
-                    });
-                    break;
-                default:
-                    throw new Error("Type not specified correctly.");
+            if (req.user.role !== "ADMIN") {
+                switch (req.body.type) {
+                    case "title":
+                        await prisma.post.update({
+                            where: {
+                                id: parseInt(req.params.postId),
+                                authorId: req.user.id,
+                            },
+                            data: {
+                                title: req.body.data,
+                            },
+                        });
+                        break;
+                    case "content":
+                        await prisma.post.update({
+                            where: {
+                                id: parseInt(req.params.postId),
+                                authorId: req.user.id,
+                            },
+                            data: {
+                                content: req.body.data,
+                            },
+                        });
+                        break;
+                    case "published":
+                        await prisma.post.update({
+                            where: {
+                                id: parseInt(req.params.postId),
+                                authorId: req.user.id,
+                            },
+                            data: {
+                                published: req.body.data,
+                            },
+                        });
+                        break;
+                    default:
+                        throw new Error("Type not specified correctly.");
+                }
+            } else {
+                switch (req.body.type) {
+                    case "title":
+                        await prisma.post.update({
+                            where: {
+                                id: parseInt(req.params.postId),
+                            },
+                            data: {
+                                title: req.body.data,
+                            },
+                        });
+                        break;
+                    case "content":
+                        await prisma.post.update({
+                            where: {
+                                id: parseInt(req.params.postId),
+                            },
+                            data: {
+                                content: req.body.data,
+                            },
+                        });
+                        break;
+                    case "published":
+                        await prisma.post.update({
+                            where: {
+                                id: parseInt(req.params.postId),
+                            },
+                            data: {
+                                published: req.body.data,
+                            },
+                        });
+                        break;
+                    default:
+                        throw new Error("Type not specified correctly.");
+                }
             }
             res.json({
                 msg: `${req.body.type} edited on post ${req.params.postId}`,
@@ -130,15 +176,24 @@ const controller = {
     },
     async delete(req, res) {
         // Authentication, TODO
-        // if (req.user.role !== "ADMIN") {
-        //     return;
-        // }
+        if (!req.user) {
+            res.sendStatus(401);
+        }
         try {
-            const post = await prisma.post.delete({
-                where: {
-                    id: req.params.postId,
-                },
-            });
+            if (req.user.role !== "ADMIN") {
+                const post = await prisma.post.delete({
+                    where: {
+                        id: req.params.postId,
+                        authorId: req.user.id,
+                    },
+                });
+            } else {
+                const post = await prisma.post.delete({
+                    where: {
+                        id: req.params.postId,
+                    },
+                });
+            }
             res.json({ post: post, msg: "Post sucessfully deleted" });
         } catch (err) {
             console.error(err);
