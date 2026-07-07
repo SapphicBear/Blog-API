@@ -5,54 +5,140 @@ const controller = {
         // TODO: Add authorization for certain paths like on users
         // If param/query wants all, send all, otherwise, return only post specified by id
         try {
-            if (!req.params.postId) {
-                if (!req.query.comments) {
-                    req.posts = await prisma.post.findMany({
-                        include: {
-                            author: true,
-                        },
-                    });
+            if (req.user.role !== "ADMIN") {
+                // For non-admin roles, only show posts that are published
+                if (!req.params.postId) {
+                    if (!req.query.comments) {
+                        req.posts = await prisma.post.findMany({
+                            where: {
+                                OR: [
+                                    {
+                                        published: true,
+                                    },
+                                    {
+                                        authorId: req.user.id,
+                                    },
+                                ],
+                            },
+                            include: {
+                                author: true,
+                            },
+                        });
+                    } else {
+                        req.posts = await prisma.post.findMany({
+                            where: {
+                                OR: [
+                                    {
+                                        published: true,
+                                    },
+                                    {
+                                        authorId: req.user.id,
+                                    },
+                                ],
+                            },
+                            include: {
+                                comments: true,
+                                author: true,
+                            },
+                        });
+                    }
                 } else {
-                    req.posts = await prisma.post.findMany({
-                        include: {
-                            comments: true,
-                            author: true,
-                        },
-                    });
-                }
+                    if (isNaN(req.params.postId)) {
+                        throw new Error(
+                            "Wrong type of postId given. Please provide a number!"
+                        );
+                    }
+                    if (!req.query.comments) {
+                        req.posts = await prisma.post.findUnique({
+                            include: {
+                                author: true,
+                            },
+                            where: {
+                                id: parseInt(req.params.postId),
 
-                res.json(req.posts);
-            } else {
-                if (isNaN(req.params.postId)) {
-                    throw new Error(
-                        "Wrong type of postId given. Please provide a number!"
-                    );
-                }
-                if (!req.query.comments) {
-                    req.posts = await prisma.post.findUnique({
-                        include: {
-                            author: true,
-                        },
-                        where: {
-                            id: parseInt(req.params.postId),
-                        },
-                    });
-                } else {
-                    req.posts = await prisma.post.findUnique({
-                        include: {
-                            comments: true,
-                            author: true,
-                        },
-                        where: {
-                            id: parseInt(req.params.postId),
-                        },
-                    });
+                                OR: [
+                                    {
+                                        published: true,
+                                    },
+                                    {
+                                        authorId: req.user.id,
+                                    },
+                                ],
+                            },
+                        });
+                    } else {
+                        req.posts = await prisma.post.findUnique({
+                            include: {
+                                comments: true,
+                                author: true,
+                            },
+                            where: {
+                                id: parseInt(req.params.postId),
+
+                                OR: [
+                                    {
+                                        published: true,
+                                    },
+                                    {
+                                        authorId: req.user.id,
+                                    },
+                                ],
+                            },
+                        });
+                    }
                 }
                 if (!req.posts) {
                     throw new Error("No posts found in database.");
                 }
                 res.json(req.posts);
+            } else {
+                if (!req.params.postId) {
+                    if (!req.query.comments) {
+                        req.posts = await prisma.post.findMany({
+                            include: {
+                                author: true,
+                            },
+                        });
+                    } else {
+                        req.posts = await prisma.post.findMany({
+                            include: {
+                                comments: true,
+                                author: true,
+                            },
+                        });
+                    }
+                } else {
+                    if (isNaN(req.params.postId)) {
+                        throw new Error(
+                            "Wrong type of postId given. Please provide a number!"
+                        );
+                    }
+                    if (!req.query.comments) {
+                        req.posts = await prisma.post.findUnique({
+                            include: {
+                                author: true,
+                            },
+                            where: {
+                                id: parseInt(req.params.postId),
+                            },
+                        });
+                    } else {
+                        req.posts = await prisma.post.findUnique({
+                            include: {
+                                comments: true,
+                                author: true,
+                            },
+                            where: {
+                                id: parseInt(req.params.postId),
+                            },
+                        });
+                    }
+                }
             }
+            if (!req.posts) {
+                throw new Error("No posts found in database.");
+            }
+            res.json(req.posts);
         } catch (err) {
             console.error(err);
             res.sendStatus(400).json({ msg: `${err}` });
@@ -172,14 +258,16 @@ const controller = {
             if (req.user.role !== "ADMIN") {
                 const post = await prisma.post.delete({
                     where: {
-                        id: req.params.postId,
-                        authorId: req.user.id,
+                        AND: [
+                            { id: parseInt(req.params.postId) },
+                            { authorId: req.user.id },
+                        ],
                     },
                 });
             } else {
                 const post = await prisma.post.delete({
                     where: {
-                        id: req.params.postId,
+                        id: parseInt(req.params.postId),
                     },
                 });
             }

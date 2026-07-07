@@ -9,13 +9,30 @@ const controller = {
                     !req.params.userId ||
                     req.user.id === parseInt(req.params.userId)
                 ) {
-                    req.users = await prisma.user.findMany({
-                        where: { id: req.user.id },
-                    });
-                    res.json(req.users);
+                    if (!req.query.posts && !req.query.comments) {
+                        req.users = await prisma.user.findMany({
+                            where: { id: req.user.id },
+                        });
+                    } else if (req.query.posts && !req.query.comments) {
+                        req.users = await prisma.user.findMany({
+                            where: { id: req.user.id },
+                            include: {
+                                posts: true,
+                            },
+                        });
+                    } else if (req.query.comments) {
+                        req.users = await prisma.user.findMany({
+                            where: { id: req.user.id },
+                            include: {
+                                posts: true,
+                                comments: true,
+                            },
+                        });
+                    }
                 } else {
                     res.sendStatus(401);
                 }
+                res.json(req.users);
             } else {
                 if (!req.params.userId) {
                     req.users = await prisma.user.findMany(); // Find all users for ADMIN users
@@ -72,6 +89,7 @@ const controller = {
             if (!req.users) {
                 throw new Error("No users found in database");
             }
+            res.json(req.users);
         } catch (err) {
             console.error(err);
             res.json({ msg: `${err}` });
@@ -151,6 +169,7 @@ const controller = {
                                     role: req.body.data,
                                 },
                             });
+                            break;
                         default:
                             throw new Error("No type given for update!");
                     }
@@ -196,6 +215,7 @@ const controller = {
                                 role: req.body.data,
                             },
                         });
+                        break;
                     default:
                         throw new Error("No type given for update!");
                 }
@@ -224,14 +244,17 @@ const controller = {
                 } else {
                     const user = await prisma.user.delete({
                         where: {
-                            id: req.params.userId,
+                            AND: [
+                                { id: parseInt(req.params.userId) },
+                                { id: req.user.id },
+                            ],
                         },
                     });
                 }
             } else {
                 const user = await prisma.user.delete({
                     where: {
-                        id: req.params.userId,
+                        id: parseInt(req.params.userId),
                     },
                 });
             }
