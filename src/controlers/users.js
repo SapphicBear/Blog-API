@@ -112,8 +112,8 @@ const controller = {
         }
     },
     async put(req, res) {
-        if (req.user.role !== "ADMIN") {
-            return;
+        if (!req.user) {
+            res.sendStatus(401);
         }
         try {
             if (!req.params.userId) {
@@ -121,48 +121,98 @@ const controller = {
                     "No userId provided. Please provide a userId number."
                 );
             }
-            switch (req.body.type) {
-                case "name":
-                    await prisma.user.update({
-                        where: {
-                            id: parseInt(req.params.userId),
-                        },
-                        data: {
-                            name: req.body.data,
-                        },
-                    });
-                    break;
-                case "email":
-                    await prisma.user.update({
-                        where: {
-                            id: parseInt(req.params.userId),
-                        },
-                        data: {
-                            email: req.body.data,
-                        },
-                    });
-                    break;
-                case "password":
-                    await prisma.user.update({
-                        where: {
-                            id: parseInt(req.params.userId),
-                        },
-                        data: {
-                            password: req.body.data,
-                        },
-                    });
-                    break;
-                case "role":
-                    await prisma.user.update({
-                        where: {
-                            id: parseInt(req.params.userId),
-                        },
-                        data: {
-                            role: req.body.data,
-                        },
-                    });
-                default:
-                    throw new Error("No type given for update!");
+            if (req.user.role !== "ADMIN") {
+                if (parseInt(req.params.userId) !== req.user.id) {
+                    res.sendStatus(401);
+                } else {
+                    switch (req.body.type) {
+                        case "name":
+                            await prisma.user.update({
+                                where: {
+                                    id: parseInt(req.params.userId),
+                                },
+                                data: {
+                                    name: req.body.data,
+                                },
+                            });
+                            break;
+                        case "email":
+                            await prisma.user.update({
+                                where: {
+                                    id: parseInt(req.params.userId),
+                                },
+                                data: {
+                                    email: req.body.data,
+                                },
+                            });
+                            break;
+                        case "password":
+                            await prisma.user.update({
+                                where: {
+                                    id: parseInt(req.params.userId),
+                                },
+                                data: {
+                                    password: req.body.data,
+                                },
+                            });
+                            break;
+                        case "role":
+                            await prisma.user.update({
+                                where: {
+                                    id: parseInt(req.params.userId),
+                                },
+                                data: {
+                                    role: req.body.data,
+                                },
+                            });
+                        default:
+                            throw new Error("No type given for update!");
+                    }
+                }
+            } else {
+                switch (req.body.type) {
+                    case "name":
+                        await prisma.user.update({
+                            where: {
+                                id: parseInt(req.params.userId),
+                            },
+                            data: {
+                                name: req.body.data,
+                            },
+                        });
+                        break;
+                    case "email":
+                        await prisma.user.update({
+                            where: {
+                                id: parseInt(req.params.userId),
+                            },
+                            data: {
+                                email: req.body.data,
+                            },
+                        });
+                        break;
+                    case "password":
+                        await prisma.user.update({
+                            where: {
+                                id: parseInt(req.params.userId),
+                            },
+                            data: {
+                                password: req.body.data,
+                            },
+                        });
+                        break;
+                    case "role":
+                        await prisma.user.update({
+                            where: {
+                                id: parseInt(req.params.userId),
+                            },
+                            data: {
+                                role: req.body.data,
+                            },
+                        });
+                    default:
+                        throw new Error("No type given for update!");
+                }
             }
             res.json({
                 msg: `User info updated for userId: ${req.params.userId}`,
@@ -173,8 +223,8 @@ const controller = {
         }
     },
     async delete(req, res) {
-        if (req.user.role !== "ADMIN") {
-            return;
+        if (!req.user) {
+            res.sendStatus(401);
         }
         try {
             if (!req.params.userId) {
@@ -182,11 +232,23 @@ const controller = {
             } else if (isNaN(req.params.userId)) {
                 throw new Error("UserId must be a number.");
             }
-            const user = await prisma.user.delete({
-                where: {
-                    id: req.params.userId,
-                },
-            });
+            if (req.user.role !== "ADMIN") {
+                if (req.user.id !== parseInt(req.params.userId)) {
+                    throw new Error("Unauthorized");
+                } else {
+                    const user = await prisma.user.delete({
+                        where: {
+                            id: req.params.userId,
+                        },
+                    });
+                }
+            } else {
+                const user = await prisma.user.delete({
+                    where: {
+                        id: req.params.userId,
+                    },
+                });
+            }
             res.json({ user: user, msg: "User sucessfully deleted" });
         } catch (err) {
             console.error(err);
