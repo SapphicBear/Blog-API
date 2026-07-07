@@ -1,5 +1,5 @@
 import { prisma } from "./../../lib/prisma.js";
-
+import bcrypt from "bcryptjs";
 const controller = {
     async get(req, res) {
         try {
@@ -97,7 +97,11 @@ const controller = {
     },
     async post(req, res) {
         // A user has a username, email, posts and comments
+        if (req.user) {
+            res.sendStatus(401);
+        }
         try {
+            const hashedPassword = await bcrypt.hash(req.body.password, 10);
             await prisma.user.create({
                 include: {
                     posts: [],
@@ -106,7 +110,7 @@ const controller = {
                 data: {
                     email: req.body.email,
                     name: req.body.name,
-                    password: req.body.password,
+                    password: hashedPassword,
                 },
             });
             res.json({ msg: "User added to database" });
@@ -151,12 +155,16 @@ const controller = {
                             });
                             break;
                         case "password":
+                            const newHashedPassword = await bcrypt.hash(
+                                req.body.data,
+                                10
+                            );
                             await prisma.user.update({
                                 where: {
                                     id: parseInt(req.params.userId),
                                 },
                                 data: {
-                                    password: req.body.data,
+                                    password: newHashedPassword,
                                 },
                             });
                             break;

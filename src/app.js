@@ -9,7 +9,6 @@ const PORT = process.env.PORT | 3000;
 
 app.use(express.urlencoded({ extended: true }));
 app.use(cors(corsOptions));
-
 app.use(
     models.uri.USERS_URI,
     passport.authenticate("jwt", { session: false }),
