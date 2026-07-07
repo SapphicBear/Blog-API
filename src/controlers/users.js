@@ -2,6 +2,26 @@ import { prisma } from "./../../lib/prisma.js";
 
 const controller = {
     async get(req, res) {
+        if (req.user.role !== "ADMIN") {
+            if (req.user.id == req.params.userId || !req.params.userId) {
+                try {
+                    req.users = await prisma.user.findMany({
+                        where: { id: req.user.id },
+                    });
+                    if (!req.users) {
+                        throw new Error("No users found");
+                    }
+                    res.json(req.users);
+                } catch (err) {
+                    console.error(err);
+                    res.json({ msg: `${err}` });
+                }
+            } else {
+                res.status(401).json({
+                    msg: "Unauthorized: You are not admin",
+                });
+            }
+        }
         if (!req.params.userId) {
             try {
                 if (!req.query.posts) {
@@ -92,6 +112,9 @@ const controller = {
         }
     },
     async put(req, res) {
+        if (req.user.role !== "ADMIN") {
+            return;
+        }
         try {
             if (!req.params.userId) {
                 throw new Error(
@@ -150,10 +173,9 @@ const controller = {
         }
     },
     async delete(req, res) {
-        // Authentication, TODO
-        // if (req.user.role !== "ADMIN") {
-        //     return;
-        // }
+        if (req.user.role !== "ADMIN") {
+            return;
+        }
         try {
             if (!req.params.userId) {
                 throw new Error("Please provide a userId.");

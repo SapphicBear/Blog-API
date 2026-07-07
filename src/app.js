@@ -12,12 +12,12 @@ app.use(cors(corsOptions));
 
 app.use(
     models.uri.USERS_URI,
-    /* passport.authenticate("jwt", { session: false }), */
+    passport.authenticate("jwt", { session: false }),
     routes.users
 );
 app.use(
     models.uri.POSTS_URI,
-    /* passport.authenticate("jwt", { session: false }), */
+    passport.authenticate("jwt", { session: false }),
     routes.posts
 );
 app.use(models.uri.LOGIN_URI, routes.auth);

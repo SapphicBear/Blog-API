@@ -1,4 +1,5 @@
 import passport from "passport";
+import "dotenv/config";
 import LocalStrategy from "passport-local";
 import { prisma } from "./../lib/prisma.js";
 import passportJWT from "passport-jwt";
@@ -11,20 +12,22 @@ passport.use(
             usernameField: "email",
             passwordField: "password",
         },
-        function (email, password, cb) {
-            return prisma.user
-                .findUnique({ email, password })
-                .then((user) => {
-                    if (!user) {
-                        return cb(null, false, {
-                            message: "Incorrect email or password.",
-                        });
-                    }
-                    return cb(null, user, {
-                        message: "Logged in successfully",
+        async function (email, password, cb) {
+            try {
+                const user = await prisma.user.findUnique({
+                    where: { email: email, password: password },
+                });
+                if (!user) {
+                    return cb(null, false, {
+                        message: "Wrong password or email",
                     });
-                })
-                .catch((err) => cb(err));
+                }
+                return cb(null, user, {
+                    message: "Logged in successfully",
+                });
+            } catch (err) {
+                return cb(err);
+            }
         }
     )
 );
@@ -33,12 +36,16 @@ passport.use(
     new JWTStrategy(
         {
             jwtFromRequest: ExtractJWT.fromAuthHeaderAsBearerToken(),
-            secretOrKey: "SECRET",
+            secretOrKey: process.env.SECRET,
         },
         function (jwtPayload, cb) {
             return prisma.user
-                .findUnique(jwtPayload.id)
+                .findUnique({ where: { id: jwtPayload.id } })
                 .then((user) => {
+                    console.log(user, "hiii");
+                    if (!user) {
+                        return cb(false, null, { message: "User not found" });
+                    }
                     return cb(null, user);
                 })
                 .catch((err) => {
