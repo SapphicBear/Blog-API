@@ -42,7 +42,6 @@ passport.use(
             return prisma.user
                 .findUnique({ where: { id: jwtPayload.id } })
                 .then((user) => {
-                    console.log(user, "hiii");
                     if (!user) {
                         return cb(false, null, { message: "User not found" });
                     }

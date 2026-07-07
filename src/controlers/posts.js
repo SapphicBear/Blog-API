@@ -4,8 +4,8 @@ const controller = {
     async get(req, res) {
         // TODO: Add authorization for certain paths like on users
         // If param/query wants all, send all, otherwise, return only post specified by id
-        if (!req.params.postId) {
-            try {
+        try {
+            if (!req.params.postId) {
                 if (!req.query.comments) {
                     req.posts = await prisma.post.findMany({
                         include: {
@@ -20,17 +20,9 @@ const controller = {
                         },
                     });
                 }
-                if (!req.posts) {
-                    throw new Error("No posts found in database.");
-                } else {
-                    res.json(req.posts);
-                }
-            } catch (err) {
-                console.error(err);
-                res.sendStatus(400).json({ msg: `${err}` });
-            }
-        } else {
-            try {
+
+                res.json(req.posts);
+            } else {
                 if (isNaN(req.params.postId)) {
                     throw new Error(
                         "Wrong type of postId given. Please provide a number!"
@@ -57,16 +49,13 @@ const controller = {
                     });
                 }
                 if (!req.posts) {
-                    throw new Error(
-                        "No post with that postId found in Database"
-                    );
-                } else {
-                    res.json({ posts: req.posts });
+                    throw new Error("No posts found in database.");
                 }
-            } catch (err) {
-                console.error(err);
-                res.json({ msg: `${err}` });
+                res.json(req.posts);
             }
+        } catch (err) {
+            console.error(err);
+            res.sendStatus(400).json({ msg: `${err}` });
         }
     },
     async post(req, res) {
