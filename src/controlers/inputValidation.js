@@ -6,4 +6,4 @@ const inputValidation = {
     ],
     signUp: [],
 };
-export default { inputValidation };
+export default inputValidation;
