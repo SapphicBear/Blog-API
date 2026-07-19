@@ -2,8 +2,6 @@ import { prisma } from "./../../lib/prisma.js";
 
 const controller = {
     async get(req, res) {
-        // TODO: Add authorization for certain paths like on users
-        // If param/query wants all, send all, otherwise, return only post specified by id
         try {
             if (req.user.role !== "ADMIN") {
                 // For non-admin roles, only show posts that are published
