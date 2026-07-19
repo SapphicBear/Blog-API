@@ -1,7 +1,7 @@
 import cors from "cors";
 const corsOptions = {
     origin: function (origin, callback) {
-        const allowedOrigins = ["http://localhost:3000"];
+        const allowedOrigins = ["http://localhost:8080"];
         if (!origin || allowedOrigins.includes(origin)) {
             callback(null, true);
         } else {
