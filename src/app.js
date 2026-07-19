@@ -9,6 +9,7 @@ const PORT = process.env.PORT | 3000;
 
 app.use(express.urlencoded({ extended: true }));
 app.use(cors(corsOptions));
+
 // Handle OPTIONS request preflight
 app.use((req, res, next) => {
     if (req.method === "OPTIONS") {
