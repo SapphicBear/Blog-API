@@ -1,5 +1,7 @@
 import { prisma } from "./../../lib/prisma.js";
 import bcrypt from "bcryptjs";
+// same problem as with other controllers, this needs to be reduced and fixed.
+// TODO: Fix
 const controller = {
     async get(req, res) {
         try {

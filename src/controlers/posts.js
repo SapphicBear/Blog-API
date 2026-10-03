@@ -6,6 +6,7 @@ const controller = {
             if (req.user.role !== "ADMIN") {
                 // For non-admin roles, only show posts that are published
                 if (!req.params.postId) {
+                    // posts can have comments, if specified in URL request
                     if (!req.query.comments) {
                         req.posts = await prisma.post.findMany({
                             where: {
@@ -143,6 +144,7 @@ const controller = {
         }
     },
     async post(req, res) {
+        // if user isnt signed in, send error.
         if (!req.user) {
             res.sendStatus(401);
         }
@@ -276,5 +278,6 @@ const controller = {
         }
     },
 };
-
+// There is a lot here that could be done better and is very much spaghetti...
+// TODO: Fix
 export default controller;
