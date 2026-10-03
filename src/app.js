@@ -17,6 +17,8 @@ app.use((req, res, next) => {
     }
     next();
 });
+
+// authentication routes using JWTs
 app.use(
     models.uri.USERS_URI,
     passport.authenticate("jwt", { session: false }),
@@ -27,13 +29,16 @@ app.use(
     passport.authenticate("jwt", { session: false }),
     routes.posts
 );
+// Currently no authentication needed for login page
 app.use(models.uri.LOGIN_URI, routes.auth);
 
+// general error catching middleware
 app.use((err, req, res, next) => {
     console.error(err);
     res.sendStatus(err.statusCode || 500);
 });
 
+// Initialization of server
 app.listen(PORT, (error) => {
     if (error) {
         throw error;
