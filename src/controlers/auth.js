@@ -5,6 +5,7 @@ import validation from "./inputValidation.js";
 import { matchedData, validationResult, body } from "express-validator";
 const controller = {
     login: [
+        // validate user input for the login
         validation.login,
         (req, res, next) => {
             let err;
